@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Hls from 'hls.js';
+import { MediaPlayer } from 'dashjs';
 
 const PlayerWrapper = styled.div`
     position: relative;
@@ -41,7 +41,6 @@ const VideoTitle = styled.h2`
     text-transform: capitalize;
 `
 const VideoLiveButtonTitle = styled.span`
-    /* display: inline-block; */
     border: 1px solid red;
     color: #fff;
     background: tomato;
@@ -56,46 +55,36 @@ const channels = [
     { id: 1, name: 'deporte' },
     { id: 2, name: 'cocina' },
     { id: 3, name: 'tecnologia' }
-]
+];
+
+const player = MediaPlayer().create();
 
 export default class Player extends Component {
     state = {
-        liveChannel: 'deporte'
+        channel: 'deporte'
     }
 
     loadVideo = () => {
-        console.log(this.state.liveChannel);
-        const { liveChannel } = this.state;
-        const streamURL = `http://localhost:3002/live/${liveChannel}/index.m3u8`;
-        console.log(this.props);
+        player.attachView(this.video);
+        player.attachSource(`http://localhost:3002/live/${this.state.channel}.mpd`);
+        player.setAutoPlay(true);
+    }
 
-        if (Hls.isSupported() && this.player) {
-            const video = this.player;
-            video.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                return false;
-            });
-
-            const hls = new Hls();
-            hls.loadSource(streamURL);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED,function() {
-                video.play();
-            });
-        } else {
-            this.player.src = streamURL;
-        }
+    changeVideo = () => {
+        player.reset();
+        this.loadVideo();
     }
 
     componentDidMount() {
+        player.initialize();
         this.loadVideo();
     }
 
     _onTouchInsidePlayer = () => {
-        if (this.player.paused) {
-            this.player.play();
+        if (this.video.paused) {
+            this.video.play();
         } else {
-            this.player.pause();
+            this.video.pause();
         }
     }
 
@@ -113,18 +102,18 @@ export default class Player extends Component {
                             controls={false}
                             onClick={this._onTouchInsidePlayer}
                             style={style}
-                            ref={(player) => this.player = player}
+                            ref={video => this.video = video}
                             autoPlay={true} />
                     </PlayerInner>
                     <VideoTitle>
-                        <b>{this.state.liveChannel}</b>
+                        <b>{this.state.channel}</b>
                         <VideoLiveButtonTitle>En Vivo</VideoLiveButtonTitle>
                     </VideoTitle>
                 </PlayerWrapper>
                 <ChannelList>
                     <h4>Channels</h4>
                     {channels.map(channel => (
-                        <li key={channel.key} onClick={() => this.setState({ liveChannel: channel.name }, this.loadVideo)}>
+                        <li key={channel.key} onClick={() => this.setState({ channel: channel.name }, this.changeVideo)}>
                             {channel.name}
                         </li>
                     ))}
