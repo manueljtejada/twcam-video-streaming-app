@@ -66,7 +66,7 @@ export default class Player extends Component {
 
     loadVideo = () => {
         player.attachView(this.video);
-        player.attachSource(`http://localhost:3002/live/${this.state.channel}.mpd`);
+        player.attachSource(`http://localhost:3002/live/${this.state.channel}/index.mpd`);
         player.setAutoPlay(true);
     }
 
