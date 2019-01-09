@@ -66,7 +66,7 @@ export default class Player extends Component {
 
     loadVideo = () => {
         player.attachView(this.video);
-        player.attachSource(`http://localhost:3002/live/${this.state.channel}/index.mpd`);
+        player.attachSource(`/live/${this.state.channel}/index.mpd`);
         player.setAutoPlay(true);
     }
 
@@ -90,8 +90,8 @@ export default class Player extends Component {
 
     render() {
         const style = {
-            width: 640,
-            height: 360,
+            width: 840,
+            height: 473,
             background: '#000',
         }
         return (
@@ -113,7 +113,7 @@ export default class Player extends Component {
                 <ChannelList>
                     <h4>Channels</h4>
                     {channels.map(channel => (
-                        <li key={channel.key} onClick={() => this.setState({ channel: channel.name }, this.changeVideo)}>
+                        <li key={channel.id} onClick={() => this.setState({ channel: channel.name }, this.changeVideo)}>
                             {channel.name}
                         </li>
                     ))}
